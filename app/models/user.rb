@@ -1,6 +1,11 @@
 class User < ApplicationRecord
+
 	attr_accessor :remember_token
-     before_save { self.email = email.downcase }
+     
+
+  has_many :microposts, dependent: :destroy
+    before_save { self.email = email.downcase }
+
      validates :name, presence: true, length: { in: 9..30 }
       VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i
       validates :email, presence: true, 
@@ -8,6 +13,7 @@ class User < ApplicationRecord
                         uniqueness: { case_sensitive: false }
       validates :password, presence: true, length: { minimum: 6 }
       has_secure_password
+
 
       def User.digest(string)
             cost = ActiveModel::SecurePassword.min_cost ?    
@@ -33,4 +39,9 @@ class User < ApplicationRecord
            def forget
               update_attribute(:remember_digest, nil)
            end
+
+# NEW METHOD
+  def feed
+    Micropost.where("user_id = ?", id)
+  end
 end
